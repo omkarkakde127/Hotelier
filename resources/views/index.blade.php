@@ -7,8 +7,6 @@
     <div class="container-xxl bg-white p-0">
        
         @include('common.navbar')
-
-
         <!-- Carousel Start -->
         <div class="container-fluid p-0 mb-5">
             <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
