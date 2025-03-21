@@ -41,7 +41,7 @@
                                         </div>
                                     </div>
         
-                                    <table id="example" class="yajra-datatables table table-striped" style="width:100%">
+                                    <table id="table1" class="yajra-datatables table table-striped" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th class="text-center">Id</th>
@@ -57,36 +57,18 @@
                         </div>
                     </div>
         
-                    @if (session('success'))
-                        <script>
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: '{{ session('success') }}',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        </script>
-                    @endif
-        
-        
                     <script>
-                       function confirmDelete(aboutId) {
-                            Swal.fire({
-                                title: "Are you sure?",
-                                text: "You won't be able to revert this!",
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonColor: "#3085d6",
-                                cancelButtonColor: "#d33",
-                                confirmButtonText: "Yes, delete it!"
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    // Submit the form if the user confirms
-                                    document.getElementById('delete-form-' + aboutId).submit();
-                                }
-                            });
-                        }
+                        document.addEventListener("DOMContentLoaded", function () {
+                        @if (session('success'))
+                        Swal.fire({
+                        title: "Success!",
+                        text: "{{ session('success') }}",
+                        icon: "success",
+                        confirmButtonColor: "#3085d6",
+                        confirmButtonText: "OK"
+                        });
+                         @endif
+                         });
                     </script>
         
         
@@ -101,15 +83,17 @@
      @include('admin/common/footer-links')
 
 
-     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let table = new DataTable('#example', {
-                processing: true,
-                serverSide: true,
-                ajax: "{{ route('testimonial_script') }}", // Ensure this route returns JSON data
-                columns: [
-                    { data: 'testimonial_id', name: 'testimonial_id' },
-                    {
+<script>
+    $(document).ready(function() {
+        var table = $('#table1').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('testimonial_script') }}",
+            columns: [{
+                    data: 'testimonial_id',
+                    name: 'testimonial_id'
+                },
+                {
                         data: 'name', // Action column, populated by controller
                         name: 'name'
                     },
@@ -117,70 +101,48 @@
                         data: 'profession', // Using 'fullName' directly from the controller
                         name: 'profession'
                     },
-                    {
-                        data: 'description',
-                        name: 'description'
-                    },
-                    
-                    {
-                        data: 'image', // Using 'fullName' directly from the controller
-                        name: 'image'
-                    },
-                    { 
-                        data: 'action', 
-                        name: 'action', 
-                        orderable: false, 
-                        searchable: false 
-                    }
-                ]
-            });
-    
-            // Delete button event listener
-            $(document).on("click", ".delete-button", function () {
-                let home_slider_id = $(this).data("id");
-    
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "You won't be able to revert this!",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, delete it!"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ route('homeslider-delete', ['home_slider_id' => '__ID__']) }}".replace('__ID__', home_slider_id),
-                            type: "DELETE",
-                            data: {
-                                _token: "{{ csrf_token() }}"
-                            },
-                            success: function (response) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Deleted!",
-                                    text: "Slider has been deleted successfully.",
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                });
-    
-                                table.ajax.reload(); // Reload DataTable
-                            },
-                            error: function () {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Error!",
-                                    text: "Something went wrong, please try again.",
-                                });
-                            }
-                        });
-                    }
-                });
-            });
+                {
+                    data: 'description',
+                    name: 'description'
+                },{
+                    data: 'image',
+                    name: 'image'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
+            ]
         });
-    </script>
+    });
 
 
+</script>
+
+
+<script>
+    function confirmDelete(homeSliderId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById("delete-form-" + homeSliderId).submit();
+        }
+    });
+}
+</script>
+
+
+<!-- SweetAlert2 CSS & JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     
 </body>

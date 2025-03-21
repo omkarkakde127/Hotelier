@@ -8,13 +8,11 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('blog', function (Blueprint $table) {
-            $table->id('blog_id');
+        Schema::create('team', function (Blueprint $table) {
+            $table->id('team_id');
             $table->string('image');
-            $table->text('tag');
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->string('Admin_name');
+            $table->string('name');
+            $table->text('profession')->nullable();
             $table->timestamps();
         });
     }
@@ -22,6 +20,6 @@ return new class extends Migration
  
     public function down()
     {
-        Schema::dropIfExists('blog');
+        Schema::dropIfExists('team');
     }
 };

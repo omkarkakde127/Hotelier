@@ -7,122 +7,117 @@ use App\Http\Controllers\Controller;
 use App\Models\Our_ServicesModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
-// use App\Models\items;
-use App\Models\items;
 
 class AdminServicesController extends Controller
 {
-    
+    // Handle DataTable AJAX request
     public function ServicesScript(Request $request)
     {
         if ($request->ajax()) {
-            $data = Our_ServicesModel::select(['our_services_id', 'title', 'description',  'image'])->latest()->get();
-            
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('new_column', function($row) {
-                    return $row->new_column; // Ensure new_column exists in DB
+            $services = Our_ServicesModel::select(['our_services_id', 'title', 'description', 'image'])->latest();
+
+            return DataTables::of($services)
+                ->addColumn('image', function ($row) {
+                    return (!empty($row->image) && file_exists(public_path($row->image)))
+                        ? '<img src="' . asset($row->image) . '" width="50" height="50">'
+                        : 'No Image';
                 })
                 ->addColumn('action', function ($row) {
                     $edit = route('our_services-edit', ['our_services_id' => $row->our_services_id]);
                     $delete = route('our_services-delete', ['our_services_id' => $row->our_services_id]);
-
-                    $actionBtn = '<a href="' . $edit . '" class="btn btn-primary">Edit</a>';
+                
+                    $actionBtn = '<a href="' . $edit . '" class="btn mt-2 btn-primary">Edit</a>';
                     $actionBtn .= '<form id="delete-form-' . $row->our_services_id . '" action="' . $delete . '" method="POST" style="display:inline;">
-                                    ' . csrf_field() . '
-                                    ' . method_field('DELETE') . '
-                                    <button type="button" class="delete-button btn btn-danger mt-2 mt-md-0 mt-lg-0" onclick="confirmDelete(' . $row->our_services_id . ')">Delete</button>
+                                  ' . csrf_field() . '
+                                  ' . method_field('DELETE') . '
+                                  <button type="button" class="delete-button btn btn-danger mt-2 ms-2" onclick="confirmDelete(' . $row->our_services_id . ')">Delete</button>
                                   </form>';
+                
                     return $actionBtn;
                 })
-                ->addColumn('image', function ($row) {
-                    return '<img style="width:50px; height:50px;" src="' . asset($row->image) . '" class="img-fluid shadow img-thumbnail" alt="img">';
-                })
-                ->rawColumns(['action', 'image'])
+                ->rawColumns(['image', 'action'])
                 ->make(true);
         }
-    
-        return view('admin/our_services/our_services');
+        return view('admin.our_services.our_services');
     }
 
-    public function Our_Services()
+    // Load main services page
+    public function Services()
     {
-        $sliders = Our_ServicesModel::all(); // Fetch all slider records
-        return view('admin/our_services/our_services', compact('sliders')); // Pass to view
+        return view('admin.our_services.our_services');
     }
 
-    public function Add()
+    public function add()
     {
-        return view('admin/our_services/add');
+        return view('admin.our_services.add');
     }
 
-    public function Store(Request $request)
+    // Store service data
+    public function store(Request $request)
     {
         $request->validate([
             'title' => 'required',
             'description' => 'required',
-            'image' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-
-        $path = 'dashboard/img/our_services/';
-
-        // Handle the file upload
+    
+        $imagePath = null;
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '.' . $file->getClientOriginalExtension(); // Create a unique filename
-            $file->move(public_path($path), $filename); // Save the file to the specified path
-            $imagePath = $path . $filename; // Create full path for storage in DB
-        } else {
-            return back()->withErrors(['image' => 'Image upload failed. Please try again.']);
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('dashboard/img/our_services/'), $filename);
+            $imagePath = 'dashboard/img/our_services/' . $filename;
         }
-        $data = ['image' => $imagePath, 'title' => $request->title, 'description' => $request->description];
-        Our_ServicesModel::create($data);
-
-        session()->flash('success', 'Data has been added successfully!');
-        return redirect('admin/our_services');
-    }
-
     
-    public function Edit($our_services_id)
+        Our_ServicesModel::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'image' => $imagePath,
+        ]);
+    
+        return redirect()->route('services')->with('success', 'Service added successfully!');
+
+    }
+    
+    public function edit($our_services_id)
     {
         $data = Our_ServicesModel::findOrFail($our_services_id);
-        // return view('homeslider-edit', compact('data'));\
-        return view('admin/our_services/edit', compact('data'));
+        return view('admin.our_services.edit', compact('data'));
     }
-    public function Update(Request $request, $our_services_id)
+
+    // Update service data
+    public function update(Request $request, $our_services_id)
     {
         $request->validate([
             'title' => 'required',
             'description' => 'required',
-            'image' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $data = Our_ServicesModel::findOrFail($our_services_id);
-        $data->title = $request->input('title');
-        $data->description = $request->input('description');
-
+    
         if ($request->hasFile('image')) {
-            $path = 'dashboard/img/our_services/';
-            if (File::exists($path)) {
-                File::delete($path);
+            if (File::exists(public_path($data->image))) {
+                File::delete(public_path($data->image));
             }
+    
             $file = $request->file('image');
-            $extention = $file->getClientOriginalExtension();
-            $filename = time() . '.' . $extention;
-            $file->move('dashboard/img/our_services/', $filename);
-            $data->image = $path . $filename;
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('dashboard/img/our_services/'), $filename);
+            $data->image = 'dashboard/img/our_services/' . $filename;
         }
     
-        $data->save();
-        session()->flash('success', 'Data has been Updated successfully!');
-        return redirect('admin/our_services');
+        $data->update($request->except('image') + ['image' => $data->image]);
+    
+        return redirect()->route('services')->with('success', 'Service updated successfully!');
     }
+
+    // Delete service
     public function Delete($our_services_id)
     {
         $slider = Our_ServicesModel::findOrFail($our_services_id);
         $slider->delete();
-        session()->flash('delete-button', 'Data has been deleted successfully!');
-        return redirect('admin/our_services');
+    
+        return redirect()->route('services')->with('success', 'You have successfully deleted the slider.');
     }
-  
 }

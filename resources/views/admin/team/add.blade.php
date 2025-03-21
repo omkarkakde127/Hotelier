@@ -22,9 +22,9 @@
             <h1>Add Page</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Rooms</a></li>
+                    <li class="breadcrumb-item"><a href="index.html">Team</a></li>
                     <li class="breadcrumb-item">Components</li>
-                    <li class="breadcrumb-item">Rooms</li>
+                    <li class="breadcrumb-item">Team</li>
                     <li class="breadcrumb-item active">Add Page</li>
 
                 </ol>
@@ -34,16 +34,16 @@
         <section class="section">
             <div class="card">
                 <div class="card-body pt-3">
-                    <form action="{{ route('blog-store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('team-store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row">
                             <div class="col-lg-6">
 
                                 <div class="mb-3">
-                                    <label for="title" class="form-label">Title</label>
-                                    <input type="text" class="form-control" name="title" id="title" placeholder="Title">
-                                    @error('title')
+                                    <label for="name" class="form-label">Name</label>
+                                    <input type="text" class="form-control" name="name" id="name" placeholder="name">
+                                    @error('name')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -56,27 +56,13 @@
                                 </div>
 
 
-                                <div class="form-group mt-3">
-                                    <label for="text">Tag</label>
-                                    <input type="text" name="tag" id="tag" class="form-control" placeholder="Tag" required>
-                                </div>
-
-
-
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group mt-3">
-                                    <label for="Admin_name">Admin Name</label>
-                                    <input type="text" name="Admin_name" id="Admin_name" class="form-control" placeholder="Admin Name"
-                                        required>
-                                </div>
 
                             </div>
                         </div>
 
                         <div class="mb-3 mt-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea name="description" id="description" class="form-control" placeholder="Description"></textarea>
+                            <label for="profession" class="form-label">Profession</label>
+                            <textarea name="profession" id="profession" class="form-control" placeholder="profession"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary mt-3">Add Item</button>
                     </form>

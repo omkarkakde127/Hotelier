@@ -27,7 +27,7 @@
                     <h1>Edit Page</h1>
                     <nav>
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Rooms</a></li>
+                            <li class="breadcrumb-item"><a href="index">Rooms</a></li>
         
                             <li class="breadcrumb-item">Rooms</li>
                             <li class="breadcrumb-item active">Update</li>
@@ -43,7 +43,7 @@
                                 <div class="alert alert-success">{{ session('success') }}</div>
                             @endif
         
-                            <form action="{{ route('blog-update', $data->blog_id) }}" method="POST"
+                            <form action="{{ route('room-update', $data->room_id) }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
                                 <!-- Title input field -->
@@ -61,14 +61,6 @@
                                             <label for="tag">Tag</label>
                                             <input type="text" name="tag" id="tag" class="form-control"
                                                 value="{{ $data->tag }}" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-        
-                                        <div class="form-group">
-                                            <label for="Admin_name">Admin_name</label>
-                                            <input type="text" name="Admin_name" id="Admin_name" class="form-control"
-                                                value="{{ $data->Admin_name }}" required>
                                         </div>
                                     </div>
         

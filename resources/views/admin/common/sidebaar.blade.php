@@ -38,7 +38,7 @@
           </a>
         </li>
         <li class="sidebar-item">
-          <a class="sidebar-link" href="{{ route('about_script') }}" aria-expanded="false">
+          <a class="sidebar-link" href="{{ route('about') }}" aria-expanded="false">
             <span>
               <i class="ti ti-alert-circle"></i>
             </span>
@@ -47,16 +47,16 @@
         </li>
         
         <li class="sidebar-item">
-          <a class="sidebar-link" href="{{route('blog_script')}}" aria-expanded="false">
+          <a class="sidebar-link" href="{{route('room')}}" aria-expanded="false">
             <span>
               <i class="ti ti-cards"></i>
             </span>
-            <span class="hide-menu">Blog</span>
+            <span class="hide-menu">Room</span>
           </a>
         </li>
         
         <li class="sidebar-item">
-          <a class="sidebar-link" href="{{route('our_services_script')}}" aria-expanded="false">
+          <a class="sidebar-link" href="{{route('services')}}" aria-expanded="false">
             <span>
               <i class="ti ti-file-description"></i>
             </span>
@@ -65,11 +65,38 @@
         </li>
         
         <li class="sidebar-item">
-          <a class="sidebar-link" href="{{route('testimonial_script')}}" aria-expanded="false">
+          <a class="sidebar-link" href="{{route('testimonial')}}" aria-expanded="false">
             <span>
               <i class="ti ti-typography"></i>
             </span>
             <span class="hide-menu">Testimonial</span>
+          </a>
+        </li>
+
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{route('luxury')}}" aria-expanded="false">
+            <span>
+              <i class="ti ti-cards"></i>
+            </span>
+            <span class="hide-menu">Luxury</span>
+          </a>
+        </li>
+
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{route('team')}}" aria-expanded="false">
+            <span>
+              <i class="ti ti-cards"></i>
+            </span>
+            <span class="hide-menu">Team</span>
+          </a>
+        </li>
+
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="{{asset('admin/booking')}}" aria-expanded="false">
+            <span>
+              <i class="ti ti-typography"></i>
+            </span>
+            <span class="hide-menu">Booking</span>
           </a>
         </li>
         

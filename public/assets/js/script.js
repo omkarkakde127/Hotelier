@@ -79,3 +79,40 @@ window.onload = function() {
         document.getElementById("seats3").innerText = availableSeats.bus3;
     }
 };
+
+
+//sweetAlert script
+
+document.querySelector("form").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    
+    // Simulate form submission (e.g., AJAX call or form logic here)
+    // If successful, show SweetAlert
+    Swal.fire({
+        title: 'Form Submitted!',
+        text: 'Your form has been submitted successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+    }).then(function() {
+        // Optionally redirect or reset the form
+        event.target.submit(); // Submit the form programmatically
+    });
+});
+
+
+//sweetAlert script
+document.querySelector("form").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent the default form submission
+    
+    // Simulate form submission (e.g., AJAX call or form logic here)
+    // If successful, show SweetAlert
+    Swal.fire({
+        title: 'Form Submitted!',
+        text: 'Your form has been submitted successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+    }).then(() => {
+        // Optionally redirect or reset the form
+        this.submit(); // Submit the form programmatically
+    });
+});

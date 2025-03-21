@@ -7,127 +7,139 @@ use App\Http\Controllers\Controller;
 use App\Models\TestimonialModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\File;
-// use App\Models\items;
-use App\Models\items;
 
 class AdminTestimonialController extends Controller
 {
-    
     public function TestimonialScript(Request $request)
     {
         if ($request->ajax()) {
-            $data = TestimonialModel::select(['testimonial_id', 'image', 'description','name','profession'])->latest()->get();
-            
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('new_column', function($row) {
-                    return $row->new_column; // Ensure new_column exists in DB
+            $sliders = TestimonialModel::select(['testimonial_id', 'description', 'image','name','profession'])->latest();
+
+            return DataTables::of($sliders)
+                ->addColumn('image', function ($row) {
+                    if (!empty($row->image) && file_exists(public_path($row->image))) {
+                        return '<img src="' . asset($row->image) . '" width="50" height="50">';
+                    }
+                    return 'No Image';
                 })
                 ->addColumn('action', function ($row) {
                     $edit = route('testimonial-edit', ['testimonial_id' => $row->testimonial_id]);
                     $delete = route('testimonial-delete', ['testimonial_id' => $row->testimonial_id]);
-
-                    $actionBtn = '<a href="' . $edit . '" class="btn btn-primary">Edit</a>';
+                
+                    $actionBtn = '<a href="' . $edit . '" class="btn mt-2 btn-primary">Edit</a>';
                     $actionBtn .= '<form id="delete-form-' . $row->testimonial_id . '" action="' . $delete . '" method="POST" style="display:inline;">
-                                    ' . csrf_field() . '
-                                    ' . method_field('DELETE') . '
-                                    <button type="button" class="delete-button btn btn-danger mt-2 mt-md-0 mt-lg-0" onclick="confirmDelete(' . $row->testimonial_id . ')">Delete</button>
+                                  ' . csrf_field() . '
+                                  ' . method_field('DELETE') . '
+                                  <button type="button" class="delete-button btn btn-danger mt-2 ms-2" onclick="confirmDelete(' . $row->testimonial_id . ')">Delete</button>
                                   </form>';
+                
                     return $actionBtn;
                 })
-                ->addColumn('image', function ($row) {
-                    return '<img style="width:50px; height:50px;" src="' . asset($row->image) . '" class="img-fluid shadow img-thumbnail" alt="img">';
-                })
-                ->rawColumns(['action', 'image'])
+                
+                ->rawColumns(['image', 'action'])
                 ->make(true);
         }
-    
-        return view('admin/testimonial/testimonial');
+        // return response()->json(['error' => 'Invalid request'], 400);
+        return view('admin.testimonial.testimonial');
     }
+
+
 
     public function Testimonial()
     {
-        $sliders = TestimonialModel::all(); // Fetch all slider records
-        return view('admin/testimonial/testimonial', compact('sliders')); // Pass to view
+        return view('admin.testimonial.testimonial');
     }
 
-    public function Add()
+    public function add()
     {
-        return view('admin/testimonial/add');
+        return view('admin.testimonial.add');
     }
 
-    public function Store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
-            'image' => 'required',
             'description' => 'required',
             'name' => 'required',
             'profession' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-
-        $path = 'dashboard/img/testimonial/';
-
-        // Handle the file upload
+    
+        // Handle Image Upload
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '.' . $file->getClientOriginalExtension(); // Create a unique filename
-            $file->move(public_path($path), $filename); // Save the file to the specified path
-            $imagePath = $path . $filename; // Create full path for storage in DB
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('dashboard/img/testimonial/'), $filename);
+            $imagePath = 'dashboard/img/testimonial/' . $filename;
         } else {
             return back()->withErrors(['image' => 'Image upload failed. Please try again.']);
         }
-        $data = ['image' => $imagePath, 'description' => $request->description, 'name' => $request->name,'profession' => $request->profession];
-        TestimonialModel::create($data);
-
-        session()->flash('success', 'Data has been added successfully!');
-        return redirect('admin/testimonial');
-    }
-
     
-    public function Edit($testimonial_id)
+        // Store Data in Database
+        TestimonialModel::create([
+            'description' => $request->description,
+            'name' => $request->name,
+            'profession' => $request->profession,
+            'image' => $imagePath,
+        ]);
+    
+        // Flash success message to session
+        session()->flash('success', 'Data has been added successfully!');
+    
+        return redirect()->route('testimonial');
+    }
+    
+
+    public function edit($testimonial_id)
     {
         $data = TestimonialModel::findOrFail($testimonial_id);
-        // return view('homeslider-edit', compact('data'));\
-        return view('admin/testimonial/edit', compact('data'));
+        return view('admin.testimonial.edit', compact('data'));
     }
-    public function Update(Request $request, $testimonial_id)
+
+    public function update(Request $request, $testimonial_id)
     {
         $request->validate([
-            'image' => 'required',
             'description' => 'required',
             'name' => 'required',
             'profession' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     
         $data = TestimonialModel::findOrFail($testimonial_id);
-        $data->description = $request->input('description'); // Fixed the typo here
-        $data->name = $request->input('name');
-        $data->profession = $request->input('profession');
     
+        // Handle Image Upload
         if ($request->hasFile('image')) {
-            $path = 'dashboard/img/testimonial/';
-            if (File::exists($data->image)) { // Ensure the specific file is deleted, not just the folder
-                File::delete($data->image);
+            // Delete old image if it exists
+            if (!empty($data->image) && File::exists(public_path($data->image))) {
+                File::delete(public_path($data->image));
             }
+    
+            // Upload new image
             $file = $request->file('image');
-            $extension = $file->getClientOriginalExtension();
-            $filename = time() . '.' . $extension;
-            $file->move('dashboard/img/testimonial/', $filename);
-            $data->image = $path . $filename;
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('dashboard/img/testimonial/'), $filename);
+            $data->image = 'dashboard/img/testimonial/' . $filename;
         }
     
-        $data->save();
-        session()->flash('success', 'Data has been Updated successfully!');
-        return redirect('admin/testimonial');
+        // Update other fields
+        $data->update([
+            'description' => $request->description,
+            'name' => $request->name,
+            'profession' => $request->profession,
+            'image' => $data->image, // Keep new image path if uploaded
+        ]);
+    
+        return redirect()->route('testimonial')->with('success', 'Testimonial updated successfully!');
     }
     
-    
+
+
     public function Delete($testimonial_id)
     {
         $slider = TestimonialModel::findOrFail($testimonial_id);
         $slider->delete();
-        session()->flash('delete-button', 'Data has been deleted successfully!');
-        return redirect('admin/testimonial');
+    
+        return redirect()->route('testimonial')->with('success', 'You have successfully deleted the slider.');
     }
-  
+    
+    
 }

@@ -43,7 +43,7 @@
                                         </div>
                                     </div>
                 
-                                    <table id="example" class="yajra-datatables table table-striped" style="width:100%">
+                                    <table id="table1" class="yajra-datatables table table-striped" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th class="text-center">Id</th>
@@ -60,38 +60,21 @@
                             </div>
                         </div>
                     </div>
-                    @if (session('success'))
+
+
                     <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                        @if (session('success'))
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: '{{ session('success') }}',
-                            showConfirmButton: false,
-                            timer: 1500
+                        title: "Success!",
+                        text: "{{ session('success') }}",
+                        icon: "success",
+                        confirmButtonColor: "#3085d6",
+                        confirmButtonText: "OK"
                         });
-                    </script>
-                @endif
-        
-        
-                <script>
-                    function confirmDelete(aboutId) {
-                         Swal.fire({
-                             title: "Are you sure?",
-                             text: "You won't be able to revert this!",
-                             icon: "warning",
-                             showCancelButton: true,
-                             confirmButtonColor: "#3085d6",
-                             cancelButtonColor: "#d33",
-                             confirmButtonText: "Yes, delete it!"
-                         }).then((result) => {
-                             if (result.isConfirmed) {
-                                 // Submit the form if the user confirms
-                                 document.getElementById('delete-form-' + aboutId).submit();
-                             }
+                         @endif
                          });
-                     }
-                 </script>
-        
+                    </script>
         
                 </section>
                 
@@ -105,7 +88,7 @@
 
 
 
-<script>
+{{-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         let table = new DataTable('#example', {
             processing: true,
@@ -135,54 +118,73 @@
                 }
             ]
         });
+      
+</script> --}}
 
-        // Delete button event listener
-        $(document).on("click", ".delete-button", function () {
-            let about_id = $(this).data("id");
 
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ route('about-delete', ['about_id' => '__ID__']) }}".replace('__ID__', about_id),
-                        type: "DELETE",
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function (response) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Deleted!",
-                                text: "Slider has been deleted successfully.",
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-
-                            table.ajax.reload(); // Reload DataTable
-                        },
-                        error: function () {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Error!",
-                                text: "Something went wrong, please try again.",
-                            });
-                        }
-                    });
-                }
+<script>
+        $(document).ready(function() {
+            var table = $('#table1').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('about_script') }}",
+                columns: [{
+                        data: 'about_id',
+                        name: 'about_id'
+                    },
+                    {
+                        data: 'title',
+                        name: 'title'
+                    },
+                    {
+                        data: 'description',
+                        name: 'description'
+                    }, { 
+                        data: 'Rooms',
+                        name: 'Rooms'
+                    },
+                    { 
+                        data: 'Staffs',
+                        name: 'Staffs'
+                    },
+                    { 
+                        data: 'Clients',
+                        name: 'Clients'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
+                ]
             });
         });
-    });
-</script>
 
 
-    
+    </script>
+
+<script>
+        function confirmDelete(homeSliderId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("delete-form-" + homeSliderId).submit();
+            }
+        });
+    }
+    </script>
+
+
+     <!-- SweetAlert2 CSS & JS -->
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
 </body>
 

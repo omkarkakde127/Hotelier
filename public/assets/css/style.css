@@ -1,6 +1,6 @@
 /********** Template CSS **********/
 :root {
-    --primary: #FEA116;
+    --primary: #cf4040;
     --light: #F1F8FF;
     --dark: #0F172B;
 }
@@ -395,7 +395,7 @@
 
 
 .nav-btn {
-    background-color: #FFA500;
+    background-color: #cf4040;
     color: white;
     font-size: 24px;
     padding: 1px 8px;
@@ -404,7 +404,7 @@
     transition: all 0.3s ease;
 }
 .nav-btn:hover {
-    background-color: #FF8C00;
+    background-color: #cf4040;
 }
 .owl-prev, .owl-next {
     position: absolute;
